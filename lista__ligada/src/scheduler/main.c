@@ -9,6 +9,9 @@
 /** Módulo estándar de valores booleanos */
 #include <stdbool.h>
 
+/*funciones de strings como strcpy, strcat o strlen*/
+#include <string.h>
+
 // Archivo de listas ligadas
 #include "queue.h"
 
@@ -19,29 +22,35 @@ int main()
   printf("Bienvenido al Acto 5: Listas\n");
 
   // En esta sección crearemos una lista ligada a partir de sus constructor
-  // y luego la usaremos normalmente. La struct Queue esta definida en el
+  // y luego la usaremos normalmente. La struct AllQueue esta definida en el
   // archivo queue.h junto con todas sus funciones publicas. En le archivo
   // queue.c esta el codigo de todas las funciones publicas y pricadas
 
   // Creo la lista ligada
-  Queue* ll = ll_init();
+  AllQueue* all_process = ll_init();
+  char* name;
+  name = "PROCESS1";
+  uint32_t arreglo[2] = {2, 4};
 
   // Agrego 10 elementos a la lista ligada
-  for (int i = 0; i < 10; i++)
+  for (uint32_t i = 0; i < 10; i++)
   {
-    ll_append(ll, i);
+    ll_append(all_process, i, 9 - i, name, arreglo);
   }
-  Process* actual = ll_get(ll, 5);
-  if (actual->state == RUNNING){
+  Process* actual = ll_get(all_process, 5);
+  if (actual->state == READY){
   // Imprimo el elemento de la posicion 5
-    printf("El elemento en la posicion %d y esta ready es %d \n", 5, actual-> value);
+    printf("El elemento en la posicion %d y esta READY es %d,  tiene el nombre %s, time > %d\n", 5, actual-> value, actual->name, actual->time_start);
+    for (int j = 0; j < 2; j++){
+      printf("soy el arreglo %d\n", actual->arreglo[j]);
+    }
   }
   else {
     printf("El elemento en la posicion %d y esta no esta ready es %d \n", 5, actual-> value);
   }
 
   // Destruyo la lista ligada liberando todos sus recursos
-  ll_destroy(ll);
+  ll_destroy(all_process);
 
   // Como ejercicio puedes probar el programa usando valgrind para ver que no
   // hay leaks de memoria y luego eliminar la linea que llama a ll_destroy para

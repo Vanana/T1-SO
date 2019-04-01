@@ -2,6 +2,11 @@
 #include <stdlib.h>
 // Liberia de input y output
 #include <stdio.h>
+/*funciones de strings como strcpy, strcat o strlen*/
+#include <string.h>
+
+#include <stdint.h>
+
 
 // Importamos el archivo .h correspondiente
 #include "queue.h"
@@ -15,13 +20,17 @@
 // lista ligada pero no se va a llamar desde el programa principal
 
 /** Funcion que crea un nodo de la lista ligada a partir de un valor */
-static Process* process_init(int value)
+static Process* process_init(uint32_t value, char* name, uint32_t* arreglo, uint32_t time_start)
 {
   // Pido la memoria para el nodo
   Process* process = malloc(sizeof(Process));
 
   // Inicializo el estado
   process -> state = READY;
+  // Inicializo los Atributos
+  strcpy(process -> name, name);
+  process -> arreglo = arreglo;
+  process -> time_start = time_start;
   // Inicializo los referencias en NULL
   process -> last = NULL;
   process -> next = NULL;
@@ -48,10 +57,10 @@ static void processs_destroy(Process* process)
 //////////////////////////// Funciones publicas ///////////////////////////
 
 /** Constructor de una lista ligada. La crea vacia inicialmente */
-Queue* ll_init()
+AllQueue* ll_init()
 {
   // Primero pido la memoria para la lista ligada
-  Queue* ll = malloc(sizeof(Queue));
+  AllQueue* ll = malloc(sizeof(AllQueue));
 
   // Luego inicializo en 0 el contador y en NULL las referencias
   ll -> count = 0;
@@ -63,10 +72,10 @@ Queue* ll_init()
 }
 
 /** Funcion que agrega un elemento al final de la lista ligada */
-void ll_append(Queue* ll, int value)
+void ll_append(AllQueue* ll, uint32_t value, uint32_t time_start, char* name, uint32_t* arreglo)
 {
   // Primero creo un nodo nuevo
-  Process* process = process_init(value);
+  Process* process = process_init(value, name, arreglo, time_start);
 
   // Luego lo agrego a la lista ligada
   if (!ll -> count)
@@ -89,7 +98,7 @@ void ll_append(Queue* ll, int value)
 }
 
 /** Funcion que obtiene el valor de la lista ligada en la posicion dada */
-Process* ll_get(Queue* ll, int position)
+Process* ll_get(AllQueue* ll, uint32_t position)
 {
   // Si no hay suficientes nodos, hago un error
   if (position >= ll -> count)
@@ -101,7 +110,7 @@ Process* ll_get(Queue* ll, int position)
 
   // Me muevo por los nodos hasta encontrar la posicion que busco
   Process* actual = ll -> start;
-  for (int i = 0; i < position; i++)
+  for (uint32_t i = 0; i < position; i++)
   {
     actual = actual -> next;
   }
@@ -110,7 +119,7 @@ Process* ll_get(Queue* ll, int position)
 }
 
 /** Funcion que destruye la lista ligada liberando la memoria utilizada */
-void ll_destroy(Queue* ll)
+void ll_destroy(AllQueue* ll)
 {
   // Primero libero la memoria de todos los nodos de manera recursiva
   processs_destroy(ll -> start);
