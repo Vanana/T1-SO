@@ -77,6 +77,7 @@ void ll_append(AllQueue* ll, uint32_t value, uint32_t time_start, char* name, ui
   // Primero creo un nodo nuevo
   Process* process = process_init(value, name, arreglo, time_start);
 
+  Process* aux_process;
   // Luego lo agrego a la lista ligada
   if (!ll -> count)
   {
@@ -86,11 +87,45 @@ void ll_append(AllQueue* ll, uint32_t value, uint32_t time_start, char* name, ui
   }
   else
   {
-    // En otro caso lo conecto con el ultimo nodo de la lista y lo dejo como
-    // nodo final de la lista
-    ll -> end -> next = process;
-    process -> last = ll -> end;
-    ll -> end = process;
+    // Lo vamos a ingresar ordenadamente segun su tiempo de llegada
+    aux_process = ll -> start;
+
+    if (aux_process -> time_start > time_start){
+      // soy el menor, soy el primero
+      ll -> start = process;
+      aux_process -> last = process;
+      process -> next = aux_process;
+    }
+
+    else{  // si voy despues de aux process
+      int i = 0;
+      while (i < ll-> count){
+        // si hay un nodo despues de aux process
+        if (aux_process -> next){
+          // reviso si voy al medio de aux process y aux process next
+          if (aux_process-> next-> time_start < time_start){
+            process -> next = aux_process -> next;
+            process -> next -> last = process;
+            aux_process -> next = process;
+            process -> last = aux_process;
+            break;
+          }
+          else{
+            // si no voy al medio, significa que puede que vaya despues
+            aux_process = aux_process-> next;
+          }
+        }
+        else{
+          // si no hay otro process es por que voy al final
+          aux_process -> next = process;
+          process -> last = aux_process;
+          ll -> end = process;
+          break;
+        }
+        i ++;
+      }
+    }
+
   }
 
   // Sumo 1 al numero de nodos
