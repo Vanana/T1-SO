@@ -47,6 +47,8 @@ AllQueue* ll_init();
 /** Funcion que agrega un elemento al final de la lista ligada */
 void ll_append(AllQueue* ll, uint32_t value, uint32_t time_start, char* name, uint32_t* arreglo);
 
+Process* ll_out(AllQueue* ll);
+
 /** Funcion que obtiene el valor de la lista ligada en la posicion dada */
 Process* ll_get(AllQueue* ll, uint32_t position);
 

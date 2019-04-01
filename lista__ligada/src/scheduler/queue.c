@@ -4,10 +4,8 @@
 #include <stdio.h>
 /*funciones de strings como strcpy, strcat o strlen*/
 #include <string.h>
-
+/** Módulo estándar de números enteros */
 #include <stdint.h>
-
-
 // Importamos el archivo .h correspondiente
 #include "queue.h"
 
@@ -125,13 +123,18 @@ void ll_append(AllQueue* ll, uint32_t value, uint32_t time_start, char* name, ui
         i ++;
       }
     }
-
   }
 
   // Sumo 1 al numero de nodos
   ll -> count++;
 }
-
+Process* ll_out(AllQueue* ll)
+{
+  Process* aux = ll -> start;
+  ll -> start = ll -> start -> next;
+  ll -> count -= 1;
+  return aux;
+}
 /** Funcion que obtiene el valor de la lista ligada en la posicion dada */
 Process* ll_get(AllQueue* ll, uint32_t position)
 {
