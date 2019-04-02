@@ -5,14 +5,15 @@
 // Definición de enumeradores para los estados de un process.
 typedef enum state {READY, RUNNING, WAITING, FINISHED} State;
 
-
 /** Estructura de un nodo de la lista ligada. Mantiene una referencia al nodo
 siguiente y al nodo anterior ademas de mantener un numero */
 typedef struct process
 {
   // Atributos de process
-  uint32_t time_start;
+  uint32_t PID;
   char name[255];
+  uint32_t time_start;
+  uint32_t priority;
   State state;
   uint32_t value;
   uint32_t* arreglo;
@@ -28,29 +29,55 @@ typedef struct process
 } Process;
 
 /** Estructura de una lista ligada. Referencia a los extremos y mantiene un
-contador de nodos en la lista */
-typedef struct all_queue
+contador de nodos en la lista
+    La lista tendra tipo, que puede ser
+      - NEW_PROCESS que son los procesos que aun no ingresan al sistema (ordenados por time)
+      - READY_PROCESS que son los procesos en estado ready (ordenados por priority)
+      - WAITING_PROCESS que son los procesos en estado waiting (ordenados por tiempo de waiting)
+      - FINISHED_PROCESS que son los procesos en estado finish (ordenados por orden de llegada)
+*/
+
+// Definición de enumeradores para los tipos de colas.
+typedef enum type_queue {NEW_PROCESS, READY_PROCESS, WAITING_PROCESS, FINISHED_PROCESS} TypeQueue;
+
+typedef struct queue
 {
+  /* tipo de cola */
+  TypeQueue type;
   /** Nodo inicial de la lista ligada */
   Process* start;
   /** Nodo final de la lista ligada */
   Process* end;
   /** Contador de elementos de la lista ligada */
   uint32_t count;
-} AllQueue;
+  /* Vamos a hacer un id contador, que usaremos para la lista ready */
+  uint32_t ID;
+} Queue;
+
+typedef struct cpu {
+  Process* process;
+  bool use;
+} CPU;
 
 ///////////////////////////// Funcione publicas ///////////////////////////
 
+/*Constructor de una CPU*/
+CPU* CPU_init();
+
 /** Constructor de una lista ligada. La crea vacia inicialmente */
-AllQueue* ll_init();
+Queue* ll_init(TypeQueue type);
 
-/** Funcion que agrega un elemento al final de la lista ligada */
-void ll_append(AllQueue* ll, uint32_t value, uint32_t time_start, char* name, uint32_t* arreglo);
+/** Funcion que agrega un elemento(crea el proceso) de manera ordenada (segun time) de la lista ligada */
+void ll_add_new(Queue* ll, char* name, uint32_t time_start, uint32_t priority, uint32_t* arreglo, uint32_t value);
 
-Process* ll_out(AllQueue* ll);
+/* Funcion que agrega un process a la lista WAITING, READY o FINISHED*/
+void ll_append( Queue* ll, Process* process);
+
+/* Funcion que saca el primer elemento(proceso) de la lista */
+Process* ll_out(Queue* ll);
 
 /** Funcion que obtiene el valor de la lista ligada en la posicion dada */
-Process* ll_get(AllQueue* ll, uint32_t position);
+Process* ll_get(Queue* ll, uint32_t position);
 
 /** Funcion que destruye la lista ligada liberando la memoria utilizada */
-void ll_destroy(AllQueue* ll);
+void ll_destroy(Queue* ll);
