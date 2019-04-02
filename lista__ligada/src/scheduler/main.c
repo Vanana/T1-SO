@@ -178,6 +178,11 @@ int main(int argument_count, char** arguments)
     t++;
   }
 
+  oficial_print(all_process);
+  oficial_print(ready_process);
+  oficial_print(waiting_process);
+  oficial_print(finished_process);
+
 /*
   Process* actual = ll_get(all_process, 2);
   if (actual->state == READY){

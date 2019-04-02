@@ -70,11 +70,23 @@ void process_print(Process* process){
     printf("\n");
   }
 }
-
 static void process_printall(Process* process){
   if (process){
     process_print(process);
     process_printall(process-> next);
+  }
+}
+
+void oficial_process_print(Process* process){
+  if (process){
+    printf("%s, %d, %d, %d, %d, %d\n", process->name, process->n_cpu, process->n_interrupt, process->turnaround, process->response_t, process->waiting);
+  }
+}
+
+static void oficial_process_printall(Process* process){
+  if (process){
+    oficial_process_print(process);
+    oficial_process_printall(process-> next);
   }
 }
 
@@ -532,6 +544,15 @@ void ll_print(Queue* ll)
   // Primero libero la memoria de todos los nodos de manera recursiva
   if (ll -> start){
     process_printall(ll -> start);
+  }
+}
+
+/** Imprime oficial */
+void oficial_print(Queue* ll)
+{
+  // Primero libero la memoria de todos los nodos de manera recursiva
+  if (ll -> start){
+    oficial_process_printall(ll -> start);
   }
 }
 

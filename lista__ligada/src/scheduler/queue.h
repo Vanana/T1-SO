@@ -117,6 +117,9 @@ void waiting_time(Queue* ll);
 /** Imprime una lista */
 void ll_print(Queue* ll);
 
+/** Imprime oficial */
+void oficial_print(Queue* ll);
+
 /** Funcion que destruye la lista ligada liberando la memoria utilizada */
 void ll_destroy(Queue* ll);
 
