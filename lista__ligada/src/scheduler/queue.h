@@ -27,6 +27,13 @@ typedef struct process
   /** Puntero al nodo siguiente */
   struct process* next;
 
+  //Estadisticas
+  uint32_t n_cpu;
+  uint32_t n_interrupt;
+  uint32_t turnaround;
+  uint32_t response_t;
+  uint32_t waiting;
+
 } Process;
 
 /** Estructura de una lista ligada. Referencia a los extremos y mantiene un
@@ -112,3 +119,12 @@ void ll_print(Queue* ll);
 
 /** Funcion que destruye la lista ligada liberando la memoria utilizada */
 void ll_destroy(Queue* ll);
+
+
+///ESTADISTICAS//
+
+/* Actualizamos turnaround, recordar que la cpu tambien hay que actualizar*/
+void turnaround_act(Queue* ll);
+
+/*Actualizamos waiting time de los procesos*/
+void waiting_act(Queue* ll);

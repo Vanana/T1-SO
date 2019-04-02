@@ -38,6 +38,13 @@ static Process* process_init(char* name, uint32_t time_start, uint32_t priority,
   process -> last = NULL;
   process -> next = NULL;
 
+  //Estadisticas
+  process -> n_cpu = 0;
+  process -> n_interrupt = 0;
+  process -> turnaround = 0;
+  process -> response_t = 0;
+  process -> waiting = 0;
+
   // Retorno el nodo
   return process;
 }
@@ -87,8 +94,8 @@ bool CPU_stop(CPU* cpu)
 {
     Process* p = cpu -> process;
     if (p){
-      printf("ESTOY EN FUNCION CPU STOP\n" );
-      process_print(p);
+//      printf("ESTOY EN FUNCION CPU STOP\n" );
+//      process_print(p);
       if (p->rafagas[(p->turn)*2]== 0){
         return true;
       }
@@ -116,8 +123,8 @@ void CPU_time(CPU* cpu) {
   if (cpu->use){
     Process* p = cpu->process;
     p->rafagas[(p->turn)*2] -= 1;
-    printf("Se actualizo el proceso ---> " );
-    process_print(p);
+//    printf("Se actualizo el proceso ---> " );
+//    process_print(p);
   }
 }
 
@@ -230,12 +237,12 @@ void ll_id(Queue * ll){
     uint32_t id = 0;
     Process* p = ll -> start;
     p -> PID = id;
-    printf("nombre %s, id %d, tiempo %d\n", p->name, p->PID, p->time_start);
+//    printf("nombre %s, id %d, tiempo %d\n", p->name, p->PID, p->time_start);
     while (p -> next) {
       id++;
       p = p -> next;
       p -> PID = id;
-      printf("nombre %s, id %d, tiempo %d\n", p->name, p->PID, p->time_start);
+//      printf("nombre %s, id %d, tiempo %d\n", p->name, p->PID, p->time_start);
     }
   }
 }
@@ -433,7 +440,7 @@ Process* ll_out(Queue* ll)
     return aux;
   }
   else{
-    printf("No quedan mas datos en la cola\n" );
+//    printf("No quedan mas datos en la cola\n" );
     return NULL;
   }
 }
@@ -501,12 +508,12 @@ Process* ll_get_out(Queue* ll, uint32_t position)
 void waiting_time(Queue* ll){
   if (ll->type == WAITING_PROCESS){
     Process* actual = ll->start;
-    printf("--------------------------------estoy actualizando waiting-------------------\n");
+//    printf("--------------------------------estoy actualizando waiting-------------------\n");
     if(actual){
       for (uint32_t i = 0; i < ll->count; i++){
         actual -> rafagas[(actual->turn)*2 +1] -= 1;
-        printf("estado actualizado\n");
-        process_print(actual);
+//        printf("estado actualizado\n");
+//        process_print(actual);
         if (actual-> rafagas[(actual->turn)*2 +1] == 0){
           actual-> state = READY;
         }
@@ -527,6 +534,41 @@ void ll_print(Queue* ll)
     process_printall(ll -> start);
   }
 }
+
+/////////////////ESTADISTICAS////////////////////////////
+
+/* Actualizamos turnaround, recordar que la cpu tambien hay que actualizar*/
+void turnaround_act(Queue* ll) {
+  if (ll->type != NEW_PROCESS && ll->type != FINISHED_PROCESS){
+    Process* actual = ll->start;
+    if (actual){
+      for (uint32_t i = 0; i < ll->count; i++){
+        actual -> turnaround ++;
+        if (actual->next){
+          actual = actual-> next;
+        }
+      }
+    }
+  }
+}
+
+/*Actualizamos waiting time de los procesos*/
+void waiting_act(Queue* ll) {
+  if (ll->type != NEW_PROCESS && ll->type != FINISHED_PROCESS){
+    Process* actual = ll->start;
+    if (actual){
+      for (uint32_t i = 0; i < ll->count; i++){
+        actual -> waiting ++;
+        if (actual->next){
+          actual = actual-> next;
+        }
+      }
+    }
+  }
+}
+
+
+
 
 /** Funcion que destruye la lista ligada liberando la memoria utilizada */
 void ll_destroy(Queue* ll)

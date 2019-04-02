@@ -15,7 +15,7 @@
 int main(int argument_count, char** arguments)
 {
   /* Imprime el mensaje en la consola */
-  printf("Prueba de procesos\n");
+//  printf("Prueba de procesos\n");
 
   if (argument_count!= 4 && argument_count!= 5){
     printf("Mal modo de uso\n" );
@@ -47,7 +47,7 @@ int main(int argument_count, char** arguments)
   // Creo la CPU
   CPU* my_cpu = CPU_init();
   if (my_cpu){
-    printf("su cpu fue creada\n");
+//    printf("su cpu fue creada\n");
   }
 
   // Creo la lista ligada, necesito definir el tipo
@@ -72,11 +72,11 @@ int main(int argument_count, char** arguments)
   uint32_t priority0, time_start0, N0;
   while (fscanf(file, "%s %d %d %d\t", name0, &priority0, &time_start0, &N0) != EOF) {
     //fscanf(file, "%s %d %d %d\t", name0, &priority0, &time_start0, &N0);
-    printf("%s %d %d %d \n", name0, priority0, time_start0, N0);
+//    printf("%s %d %d %d \n", name0, priority0, time_start0, N0);
     uint32_t* arreglo = malloc(sizeof(uint32_t)*(2*N0-1));
     for (uint32_t i = 0 ; i<(2*N0-1); i++){
       fscanf(file, "%d", &arreglo[i]);
-      printf("%d\n", arreglo[i] );
+//      printf("%d\n", arreglo[i] );
     }
     ll_add_new(all_process, name0, time_start0, priority0, N0, arreglo);
   }
@@ -88,13 +88,13 @@ int main(int argument_count, char** arguments)
 ///////////////////////////////INICIA SIMULACION////////////////////////////////////
 
   while (t < 40){
-    printf("\n\n!!!!!!!!! ESTAMOS EN TIEMPO %d !!!!!!!!!!!!!!!\n\n", t);
+//    printf("\n\n!!!!!!!!! ESTAMOS EN TIEMPO %d !!!!!!!!!!!!!!!\n\n", t);
     ////// PRIMERA ETAPA: PASAR PROCESOS DE NEW a READY y de WAITING a READY y liberar la CPU si termino su uso//////
     /* Primero entramos a READY los procesos que llegan */
     if (all_process-> count > 0){
       //printf(" proceso %d , datos %d\n", all_process->type, all_process ->count );
       actual = ll_get(all_process, 0);
-      process_print(actual);
+//      process_print(actual);
       if (actual->time_start == t){
         //si es la hora de que ingrese un proceso, ingresa a la fila READY_PROCESS
         actual = ll_out(all_process);
@@ -106,11 +106,11 @@ int main(int argument_count, char** arguments)
     /* Revisamos si el proceso de cpu ya termino, si es asi liberamos*/
     if (CPU_stop(my_cpu)){
       if (my_cpu -> process){
-        printf("liberamos cpu\n");
+//        printf("liberamos cpu\n");
         actual = my_cpu -> process;
         my_cpu -> process = NULL;
         my_cpu -> use = false;
-        process_print(actual);
+//        process_print(actual);
         if (actual-> turn == (actual-> N) - 1){
           // el proceso termino todos sus rafagas
           actual-> state = FINISHED;
@@ -118,7 +118,7 @@ int main(int argument_count, char** arguments)
         }
         else{
           actual -> state = WAITING;
-          process_print(actual);
+//          process_print(actual);
           ll_append(waiting_process, actual);
         }
       }
@@ -129,8 +129,8 @@ int main(int argument_count, char** arguments)
       actual = waiting_process->start;
       for (uint32_t i = 0; i < waiting_process->count; i++){
         if (actual->state == READY){
-          printf("SACAMOS UN PROCESO DE WAITING\n" );
-          process_print(actual);
+//          printf("SACAMOS UN PROCESO DE WAITING\n" );
+//          process_print(actual);
           actual = ll_get_out(waiting_process, i);
           actual -> turn ++;
           ll_append(ready_process, actual);
@@ -146,18 +146,33 @@ int main(int argument_count, char** arguments)
         actual -> state = RUNNING;
         my_cpu -> use = true;
         my_cpu -> process = actual;
+        actual -> n_cpu ++; //Estadisticas
+        if (actual-> turn == 0){
+          actual -> response_t = t - actual->time_start; //Estadisticas
+        }
       }
     }
 
-    printf("   ESTADOS\n" );
+/*    printf("   ESTADOS\n" );
     CPU_print(my_cpu);
     ll_print(all_process);
     ll_print(ready_process);
     ll_print(waiting_process);
     ll_print(finished_process);
+*/
     //////TERCERA ETAPA: actualizar tiempos ////////
     CPU_time(my_cpu);
     waiting_time(waiting_process);
+
+    //Estadisticas
+    turnaround_act(waiting_process);
+    turnaround_act(ready_process);
+    if (my_cpu->process){
+      my_cpu -> process -> turnaround ++;
+    }
+    waiting_act(waiting_process);
+    waiting_act(ready_process);
+
 
 
     t++;
