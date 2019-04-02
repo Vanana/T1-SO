@@ -87,7 +87,7 @@ int main(int argument_count, char** arguments)
   Process* actual;
 ///////////////////////////////INICIA SIMULACION////////////////////////////////////
 
-  while (t < 7){
+  while (t < 40){
     printf("\n\n!!!!!!!!! ESTAMOS EN TIEMPO %d !!!!!!!!!!!!!!!\n\n", t);
     ////// PRIMERA ETAPA: PASAR PROCESOS DE NEW a READY y de WAITING a READY y liberar la CPU si termino su uso//////
     /* Primero entramos a READY los procesos que llegan */
@@ -106,23 +106,24 @@ int main(int argument_count, char** arguments)
     /* Revisamos si el proceso de cpu ya termino, si es asi liberamos*/
     if (CPU_stop(my_cpu)){
       if (my_cpu -> process){
-        printf("libreamoas cpu\n");
+        printf("liberamos cpu\n");
         actual = my_cpu -> process;
         my_cpu -> process = NULL;
         my_cpu -> use = false;
-        if (actual-> turn == actual-> N - 1){
+        process_print(actual);
+        if (actual-> turn == (actual-> N) - 1){
           // el proceso termino todos sus rafagas
           actual-> state = FINISHED;
           ll_append(finished_process, actual);
         }
         else{
-          actual -> turn;
           actual -> state = WAITING;
           process_print(actual);
           ll_append(waiting_process, actual);
         }
       }
     }
+
     /* Revisamos si hay que pasar algun processo de la cola waiting a ready */
     if (waiting_process->count){
       actual = waiting_process->start;
@@ -154,6 +155,10 @@ int main(int argument_count, char** arguments)
     ll_print(ready_process);
     ll_print(waiting_process);
     ll_print(finished_process);
+    //////TERCERA ETAPA: actualizar tiempos ////////
+    CPU_time(my_cpu);
+    waiting_time(waiting_process);
+
 
     t++;
   }
@@ -206,7 +211,7 @@ int main(int argument_count, char** arguments)
   ll_destroy(waiting_process);
   ll_destroy(ready_process);
   ll_destroy(finished_process);
-  free(my_cpu);
+  CPU_destroy(my_cpu);
 
   // Como ejercicio puedes probar el programa usando valgrind para ver que no
   // hay leaks de memoria y luego eliminar la linea que llama a ll_destroy para

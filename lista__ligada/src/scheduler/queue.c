@@ -99,6 +99,7 @@ bool CPU_stop(CPU* cpu)
     }
 }
 
+/* Poner un proceso en la CPU*/
 void use_CPU(CPU* cpu, Process* p){
   if (!cpu->use && p->state == READY){
     p -> state = RUNNING;
@@ -107,6 +108,16 @@ void use_CPU(CPU* cpu, Process* p){
   }
   else{
     printf("ERROR!!! la CPU esta en uso\n" );
+  }
+}
+
+/* Actualizo los tiempos de la cpu*/
+void CPU_time(CPU* cpu) {
+  if (cpu->use){
+    Process* p = cpu->process;
+    p->rafagas[(p->turn)*2] -= 1;
+    printf("Se actualizo el proceso ---> " );
+    process_print(p);
   }
 }
 
@@ -119,6 +130,17 @@ void CPU_print(CPU* cpu) {
   else{
     printf("La cpu esta libre \n" );
   }
+}
+
+/** Funcion que destruye la cpu liberando la memoria utilizada */
+void CPU_destroy(CPU* cpu)
+{
+  // Primero libero la memoria de todos los nodos de manera recursiva
+  if (cpu -> process){
+    process_destroy(cpu -> process);
+  }
+  // Luego libero la memoria de la lista
+  free(cpu);
 }
 
 /** Constructor de una lista ligada. La crea vacia inicialmente */
@@ -223,7 +245,7 @@ void ll_append( Queue* ll, Process* process){
   if (ll->type == WAITING_PROCESS || ll->type == FINISHED_PROCESS){
     //agrego los procesos en el orden que van llegando, van pasando al final de la cola
     // Solo entran los procesos waiting
-    if(process -> state == WAITING){
+    if(process -> state == WAITING || process -> state == FINISHED){
       // En el caso de que este vacia la lista, dejo el nodo como inicial y final
       if (!ll -> count)
       {
@@ -473,6 +495,27 @@ Process* ll_get_out(Queue* ll, uint32_t position)
   actual -> last = NULL;
   ll->count -= 1;
   return actual;
+}
+
+/* Actualiza los tiempos de espera*/
+void waiting_time(Queue* ll){
+  if (ll->type == WAITING_PROCESS){
+    Process* actual = ll->start;
+    printf("--------------------------------estoy actualizando waiting-------------------\n");
+    if(actual){
+      for (uint32_t i = 0; i < ll->count; i++){
+        actual -> rafagas[(actual->turn)*2 +1] -= 1;
+        printf("estado actualizado\n");
+        process_print(actual);
+        if (actual-> rafagas[(actual->turn)*2 +1] == 0){
+          actual-> state = READY;
+        }
+        if (actual->next){
+          actual = actual-> next;
+        }
+      }
+    }
+  }
 }
 
 /** Imprime una lista */

@@ -71,8 +71,14 @@ bool CPU_stop(CPU* cpu);
 /* Poner un proceso en la cpu */
 void use_CPU(CPU* cpu, Process* p);
 
+/* Actualizo los tiempos de la cpu*/
+void CPU_time(CPU* cpu);
+
 /*Imprime la cpu*/
 void CPU_print(CPU* cpu);
+
+/** Funcion que destruye la cpu liberando la memoria utilizada */
+void CPU_destroy(CPU* cpu);
 
 /*  Imprimir un proceso */
 void process_print(Process* process);
@@ -97,6 +103,9 @@ Process* ll_get(Queue* ll, uint32_t position);
 
 /** Funcion que saca el valor de la lista ligada en la posicion dada */
 Process* ll_get_out(Queue* ll, uint32_t position);
+
+/* Actualiza los tiempos de espera*/
+void waiting_time(Queue* ll);
 
 /** Imprime una lista */
 void ll_print(Queue* ll);
