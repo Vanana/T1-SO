@@ -15,8 +15,9 @@ typedef struct process
   uint32_t time_start;
   uint32_t priority;
   State state;
-  uint32_t value;
-  uint32_t* arreglo;
+  uint32_t turn; // es el indice de la rafaga que se esta ejecutando
+  uint32_t N; // cantidad de rafagas1
+  uint32_t* rafagas; //arreglo de largo 2*N -1, indices impares A, indices pares B
 
   // En este caso no podemos referirnos a la estructura como Process ya que aun
   // no esta completo el typedef
@@ -64,11 +65,26 @@ typedef struct cpu {
 /*Constructor de una CPU*/
 CPU* CPU_init();
 
+/* Indica si el proceso que esta en cpu ya termino su ejecucion */
+bool CPU_stop(CPU* cpu);
+
+/* Poner un proceso en la cpu */
+void use_CPU(CPU* cpu, Process* p);
+
+/*Imprime la cpu*/
+void CPU_print(CPU* cpu);
+
+/*  Imprimir un proceso */
+void process_print(Process* process);
+
 /** Constructor de una lista ligada. La crea vacia inicialmente */
 Queue* ll_init(TypeQueue type);
 
 /** Funcion que agrega un elemento(crea el proceso) de manera ordenada (segun time) de la lista ligada */
-void ll_add_new(Queue* ll, char* name, uint32_t time_start, uint32_t priority, uint32_t* arreglo, uint32_t value);
+void ll_add_new(Queue* ll, char* name, uint32_t time_start, uint32_t priority, uint32_t N, uint32_t* rafagas);
+
+/** Asignamos los PID por orden de llegada*/
+void ll_id(Queue * ll);
 
 /* Funcion que agrega un process a la lista WAITING, READY o FINISHED*/
 void ll_append( Queue* ll, Process* process);
@@ -78,6 +94,12 @@ Process* ll_out(Queue* ll);
 
 /** Funcion que obtiene el valor de la lista ligada en la posicion dada */
 Process* ll_get(Queue* ll, uint32_t position);
+
+/** Funcion que saca el valor de la lista ligada en la posicion dada */
+Process* ll_get_out(Queue* ll, uint32_t position);
+
+/** Imprime una lista */
+void ll_print(Queue* ll);
 
 /** Funcion que destruye la lista ligada liberando la memoria utilizada */
 void ll_destroy(Queue* ll);
