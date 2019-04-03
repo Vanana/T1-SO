@@ -49,6 +49,7 @@ int main(int argument_count, char** arguments)
     }
   }
 
+
   // En esta sección crearemos una lista ligada a partir de sus constructor
   // y luego la usaremos normalmente. La struct Queue esta definida en el
   // archivo queue.h junto con todas sus funciones publicas. En le archivo
@@ -95,9 +96,10 @@ int main(int argument_count, char** arguments)
   ll_id(all_process);
   uint32_t t = 0;
   Process* actual;
+  bool continuo = true;
 ///////////////////////////////INICIA SIMULACION////////////////////////////////////
 
-  while (t < 50){
+  while (continuo){
 //    printf("\n\n!!!!!!!!! ESTAMOS EN TIEMPO %d !!!!!!!!!!!!!!!\n\n", t);
     ////// PRIMERA ETAPA: PASAR PROCESOS DE NEW a READY y de WAITING a READY y liberar la CPU si termino su uso//////
     /* Primero entramos a READY los procesos que llegan */
@@ -114,7 +116,7 @@ int main(int argument_count, char** arguments)
     }
     /* Revisamos si se le acabo el q al proceso en cpu, pero solo si estamos en una simulacion p */
     if (my_cpu->process && no_np && si_wait !=0 ){
-      process_print(my_cpu -> process);
+//      process_print(my_cpu -> process);
        if(my_cpu->process->q == 0 ){
          //me bloqueo y libero la memoria
          actual = my_cpu -> process;
@@ -122,8 +124,8 @@ int main(int argument_count, char** arguments)
          actual -> n_interrupt ++;
          my_cpu -> process = NULL;
          my_cpu -> use = false;
-         process_print(actual);
-         CPU_print(my_cpu);
+//         process_print(actual);
+//         CPU_print(my_cpu);
 
          //ahora vemos si alcanzo a terminar su proceso o si pasa a ready
          if (actual->rafagas[(actual->turn)*2]== 0){
@@ -227,13 +229,31 @@ int main(int argument_count, char** arguments)
     waiting_act(ready_process);
 
     t++;
+    //vemos si aun quedan elementos en las listas y la cpu
+    if (!my_cpu->use && all_process->count == 0 && ready_process->count==0 && waiting_process->count==0){
+      continuo =false;
+    }
+  }
+  FILE * f_out = fopen(output_name, "w+");
+
+  if (finished_process -> start){
+    Process* process = finished_process -> start;
+    while (1) {
+      fprintf(f_out, "%s, %d, %d, %d, %d, %d\n", process->name, process->n_cpu, process->n_interrupt, process->turnaround, process->response_t, process->waiting);
+      if (!process->next){
+        break;
+      }
+      process = process -> next;
+    }
   }
 
+  // Creamos el output del archivo
+/*
   oficial_print(all_process);
   oficial_print(ready_process);
   oficial_print(waiting_process);
   oficial_print(finished_process);
-
+*/
 
 
   // Destruyo la lista ligada liberando todos sus recursos

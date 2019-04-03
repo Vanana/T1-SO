@@ -443,8 +443,8 @@ void ll_append( Queue* ll, Process* process){
 /* Funcion que reordena la lista READY para que el que ha esperado mas ahora esta al inicio de la lista */
 void ready_new_order(Queue* ll){
   if (ll->count != 0){
-    printf("no estoy vacia\n");
-    ll_print(ll);
+//    printf("no estoy vacia\n");
+//    ll_print(ll);
     uint32_t max_waiting = 0;
     uint32_t index = 0;
     Process* process = ll->start;
