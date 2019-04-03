@@ -34,6 +34,7 @@ int main(int argument_count, char** arguments)
 
   uint32_t q = 0;
   uint8_t no_np = strcmp(tipo_sim, "np");
+  uint8_t si_wait = strcmp(tipo_sim, "w");
 
   if (argument_count == 5){
     q = atoi(arguments[4]);
@@ -112,10 +113,8 @@ int main(int argument_count, char** arguments)
       }
     }
     /* Revisamos si se le acabo el q al proceso en cpu, pero solo si estamos en una simulacion p */
-    if (my_cpu->process && no_np){
-      printf("entre\n");
+    if (my_cpu->process && no_np && si_wait !=0 ){
       process_print(my_cpu -> process);
-      printf("my q es %d\n",my_cpu->process->q );
        if(my_cpu->process->q == 0 ){
          //me bloqueo y libero la memoria
          actual = my_cpu -> process;
@@ -124,7 +123,6 @@ int main(int argument_count, char** arguments)
          my_cpu -> process = NULL;
          my_cpu -> use = false;
          process_print(actual);
-         printf("mi q es %d\n", actual->q);
          CPU_print(my_cpu);
 
          //ahora vemos si alcanzo a terminar su proceso o si pasa a ready
@@ -210,8 +208,13 @@ int main(int argument_count, char** arguments)
     //////TERCERA ETAPA: actualizar tiempos ////////
     CPU_time(my_cpu);
     waiting_time(waiting_process);
-    if (my_cpu->process && no_np){
+    if (my_cpu->process && no_np && si_wait != 0){
       my_cpu->process->q -= 1;
+    }
+
+    ////// REORDENAMOS READY SI ESTAMOS EN SCHEDULER W ////////
+    if (si_wait == 0){
+      ready_new_order(ready_process);
     }
 
     //Estadisticas
@@ -231,47 +234,6 @@ int main(int argument_count, char** arguments)
   oficial_print(waiting_process);
   oficial_print(finished_process);
 
-/*
-  Process* actual = ll_get(all_process, 2);
-  if (actual->state == READY){
-  // Imprimo el elemento de la posicion 5
-    printf("El elemento en la posicion %s y esta READY en el tiempo %d,  prioridad %d\n", actual-> name, actual->time_start, actual->priority);
-    for (int j = 0; j < (actual -> N) * 2 -1; j++){
-      printf("soy el arreglo %d\n", actual->rafagas[j]);
-    }
-  }
-  else {
-    printf("El elemento nombre %s y esta no esta ready  \n", actual-> name);
-  }
-
-  //Process* process_del = ll_out(all_process);
-  //printf("soy el elemento con tiempo = %d y valor %d\n", process_del->time_start, process_del->value);
-
-  // Info saco un proceso de all a waiting
-  actual = ll_out(all_process);
-  actual -> state = WAITING;
-  ll_append(waiting_process, actual);
-  actual = ll_out(all_process);
-  actual -> state = WAITING;
-  ll_append(waiting_process, actual);
-
-  actual = ll_get(waiting_process, 1);
-  if (actual->state == READY){
-  // Imprimo el elemento de la posicion 5
-    printf("El elemento en la posicion %s y esta READY en el tiempo %d,  prioridad %d\n",  actual-> name, actual->time_start, actual->priority);
-    for (int j = 0; j < 2; j++){
-      printf("soy el arreglo %d\n", actual->rafagas[j]);
-    }
-  }
-  else {
-    printf("El elemento nombre %s y esta no esta ready  \n", actual-> name);
-  }
-
-
-
-
-
-*/
 
 
   // Destruyo la lista ligada liberando todos sus recursos
@@ -281,9 +243,6 @@ int main(int argument_count, char** arguments)
   ll_destroy(finished_process);
   CPU_destroy(my_cpu);
 
-  // Como ejercicio puedes probar el programa usando valgrind para ver que no
-  // hay leaks de memoria y luego eliminar la linea que llama a ll_destroy para
-  // ver que detecta los leaks de memoria de la lista
 
   return 0;
 }

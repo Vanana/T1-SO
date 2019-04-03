@@ -440,6 +440,51 @@ void ll_append( Queue* ll, Process* process){
   }
 }
 
+/* Funcion que reordena la lista READY para que el que ha esperado mas ahora esta al inicio de la lista */
+void ready_new_order(Queue* ll){
+  if (ll->count != 0){
+    printf("no estoy vacia\n");
+    ll_print(ll);
+    uint32_t max_waiting = 0;
+    uint32_t index = 0;
+    Process* process = ll->start;
+    for (uint32_t i = 0; i< ll->count; i++){
+      if (process->waiting > max_waiting){
+        max_waiting = process->waiting;
+        index = i;
+      }
+      if(process -> next){
+        process = process -> next;
+      }
+    }
+    //si el maximo no es el primero, lo busco y lo pongo primero
+    if (index != 0){
+      process = ll_get(ll, index);
+      //revisamos si somos  el ultimo proceso en la cola
+      if (index + 1 == ll->count){
+        ll->end = process->last;
+        ll ->end ->next = NULL;
+
+        process ->last = NULL;
+        process -> next = ll->start;
+
+        ll->start -> last = process;
+        ll->start = process;
+      }
+      else{
+        //estamos al medio
+        process -> next ->last = process -> last;
+        process -> last -> next = process -> next;
+        process -> next = ll-> start;
+        process -> last = NULL;
+        ll -> start -> last = process;
+        ll -> start = process;
+      }
+
+    }
+  }
+}
+
 /* Funcion que saca el primer elemento de la lista */
 Process* ll_out(Queue* ll)
 {
@@ -460,7 +505,7 @@ Process* ll_out(Queue* ll)
   }
 }
 
-/** Funcion que obtiene el valor de la lista ligada en la posicion dada */
+/** Funcion que obtiene el process de la lista ligada en la posicion dada */
 Process* ll_get(Queue* ll, uint32_t position)
 {
   // Si no hay suficientes nodos, hago un error

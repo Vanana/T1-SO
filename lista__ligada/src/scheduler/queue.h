@@ -105,6 +105,9 @@ void ll_id(Queue * ll);
 /* Funcion que agrega un process a la lista WAITING, READY o FINISHED*/
 void ll_append( Queue* ll, Process* process);
 
+/* Funcion que reordena la lista READY para que el que ha esperado mas ahora esta al inicio de la lista */
+void ready_new_order(Queue* ll);
+
 /* Funcion que saca el primer elemento(proceso) de la lista */
 Process* ll_out(Queue* ll);
 
