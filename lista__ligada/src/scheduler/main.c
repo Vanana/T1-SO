@@ -32,11 +32,20 @@ int main(int argument_count, char** arguments)
   /* El tercer parametro es el tipo de simulacion*/
   char* tipo_sim = arguments[3];
 
+  uint32_t q = 0;
+  uint8_t no_np = strcmp(tipo_sim, "np");
+
   if (argument_count == 5){
-    uint32_t q = atoi(arguments[4]);
+    q = atoi(arguments[4]);
   }
   else{
-    uint32_t q = 3;
+    if (no_np == 0){
+      q = 0;
+      printf("soy q = 0\n" );
+    }
+    else{
+      q = 3;
+    }
   }
 
   // En esta sección crearemos una lista ligada a partir de sus constructor
@@ -78,7 +87,7 @@ int main(int argument_count, char** arguments)
       fscanf(file, "%d", &arreglo[i]);
 //      printf("%d\n", arreglo[i] );
     }
-    ll_add_new(all_process, name0, time_start0, priority0, N0, arreglo);
+    ll_add_new(all_process, name0, time_start0, priority0, N0, arreglo, q);
   }
   fclose(file);
 
@@ -87,7 +96,7 @@ int main(int argument_count, char** arguments)
   Process* actual;
 ///////////////////////////////INICIA SIMULACION////////////////////////////////////
 
-  while (t < 40){
+  while (t < 50){
 //    printf("\n\n!!!!!!!!! ESTAMOS EN TIEMPO %d !!!!!!!!!!!!!!!\n\n", t);
     ////// PRIMERA ETAPA: PASAR PROCESOS DE NEW a READY y de WAITING a READY y liberar la CPU si termino su uso//////
     /* Primero entramos a READY los procesos que llegan */
@@ -102,12 +111,50 @@ int main(int argument_count, char** arguments)
         ll_append(ready_process, actual);
       }
     }
+    /* Revisamos si se le acabo el q al proceso en cpu, pero solo si estamos en una simulacion p */
+    if (my_cpu->process && no_np){
+      printf("entre\n");
+      process_print(my_cpu -> process);
+      printf("my q es %d\n",my_cpu->process->q );
+       if(my_cpu->process->q == 0 ){
+         //me bloqueo y libero la memoria
+         actual = my_cpu -> process;
+         actual -> q = q;
+         actual -> n_interrupt ++;
+         my_cpu -> process = NULL;
+         my_cpu -> use = false;
+         process_print(actual);
+         printf("mi q es %d\n", actual->q);
+         CPU_print(my_cpu);
+
+         //ahora vemos si alcanzo a terminar su proceso o si pasa a ready
+         if (actual->rafagas[(actual->turn)*2]== 0){
+           // si termino su rafaga, vemos si le quedan mas
+           if (actual-> turn == (actual-> N) - 1){
+             // el proceso termino todos sus rafagas
+             actual-> state = FINISHED;
+             ll_append(finished_process, actual);
+           }
+           else{
+             actual -> state = WAITING;
+   //          process_print(actual);
+             ll_append(waiting_process, actual);
+           }
+         }
+         else {
+           //si no alcanzo a terminar
+           actual -> state = READY;
+           ll_append(ready_process, actual);
+         }
+       }
+    }
 
     /* Revisamos si el proceso de cpu ya termino, si es asi liberamos*/
     if (CPU_stop(my_cpu)){
       if (my_cpu -> process){
 //        printf("liberamos cpu\n");
         actual = my_cpu -> process;
+        actual -> q = q;
         my_cpu -> process = NULL;
         my_cpu -> use = false;
 //        process_print(actual);
@@ -146,10 +193,10 @@ int main(int argument_count, char** arguments)
         actual -> state = RUNNING;
         my_cpu -> use = true;
         my_cpu -> process = actual;
-        actual -> n_cpu ++; //Estadisticas
-        if (actual-> turn == 0){
+        if (actual-> n_cpu == 0 ){
           actual -> response_t = t - actual->time_start; //Estadisticas
         }
+        actual -> n_cpu ++; //Estadisticas
       }
     }
 
@@ -163,6 +210,9 @@ int main(int argument_count, char** arguments)
     //////TERCERA ETAPA: actualizar tiempos ////////
     CPU_time(my_cpu);
     waiting_time(waiting_process);
+    if (my_cpu->process && no_np){
+      my_cpu->process->q -= 1;
+    }
 
     //Estadisticas
     turnaround_act(waiting_process);
@@ -172,8 +222,6 @@ int main(int argument_count, char** arguments)
     }
     waiting_act(waiting_process);
     waiting_act(ready_process);
-
-
 
     t++;
   }

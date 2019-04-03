@@ -19,6 +19,9 @@ typedef struct process
   uint32_t N; // cantidad de rafagas1
   uint32_t* rafagas; //arreglo de largo 2*N -1, indices impares A, indices pares B
 
+  // para p //
+  uint32_t q;
+
   // En este caso no podemos referirnos a la estructura como Process ya que aun
   // no esta completo el typedef
 
@@ -94,7 +97,7 @@ void process_print(Process* process);
 Queue* ll_init(TypeQueue type);
 
 /** Funcion que agrega un elemento(crea el proceso) de manera ordenada (segun time) de la lista ligada */
-void ll_add_new(Queue* ll, char* name, uint32_t time_start, uint32_t priority, uint32_t N, uint32_t* rafagas);
+void ll_add_new(Queue* ll, char* name, uint32_t time_start, uint32_t priority, uint32_t N, uint32_t* rafagas, uint32_t q);
 
 /** Asignamos los PID por orden de llegada*/
 void ll_id(Queue * ll);

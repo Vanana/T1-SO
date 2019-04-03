@@ -20,7 +20,7 @@
 // lista ligada pero no se va a llamar desde el programa principal
 
 /** Funcion que crea un nodo de la lista ligada a partir de un valor */
-static Process* process_init(char* name, uint32_t time_start, uint32_t priority, uint32_t N, uint32_t* rafagas)
+static Process* process_init(char* name, uint32_t time_start, uint32_t priority, uint32_t N, uint32_t* rafagas, uint32_t q)
 {
   // Pido la memoria para el nodo
   Process* process = malloc(sizeof(Process));
@@ -34,6 +34,9 @@ static Process* process_init(char* name, uint32_t time_start, uint32_t priority,
   process -> turn = 0;
   process -> N = N;
   process -> rafagas = rafagas;
+
+  process -> q = q;
+
   // Inicializo los referencias en NULL
   process -> last = NULL;
   process -> next = NULL;
@@ -178,7 +181,7 @@ Queue* ll_init(TypeQueue type)
 }
 
 /**  NEW_PROCESS>> Funcion que crea y agrega un elemento al final de la lista ligada */
-void ll_add_new(Queue* ll, char* name, uint32_t time_start, uint32_t priority, uint32_t N, uint32_t* rafagas)
+void ll_add_new(Queue* ll, char* name, uint32_t time_start, uint32_t priority, uint32_t N, uint32_t* rafagas, uint32_t q)
 {
   // Solo las listas NEW_PROCESS pueden crear elementos
   if (ll -> type == NEW_PROCESS){
@@ -186,7 +189,7 @@ void ll_add_new(Queue* ll, char* name, uint32_t time_start, uint32_t priority, u
      y luego ingresa los procesos ordenados por time_start*/
 
     // Primero creo un nodo nuevo
-    Process* process = process_init(name, time_start, priority, N, rafagas);
+    Process* process = process_init(name, time_start, priority, N, rafagas, q);
     // Luego lo agrego a la lista ligada
     if (!ll -> count)
     {
