@@ -40,6 +40,7 @@ static Process* process_init(char* name, uint32_t time_start, uint32_t priority,
   // Inicializo los referencias en NULL
   process -> last = NULL;
   process -> next = NULL;
+  process -> next_print = NULL;
 
   //Estadisticas
   process -> n_cpu = 0;
