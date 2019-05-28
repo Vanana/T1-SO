@@ -181,7 +181,7 @@ Queue* ll_init(TypeQueue type)
 }
 
 /**  NEW_PROCESS>> Funcion que crea y agrega un elemento al final de la lista ligada */
-void ll_add_new(Queue* ll, char* name, uint32_t time_start, uint32_t priority, uint32_t N, uint32_t* rafagas, uint32_t q)
+Process* ll_add_new(Queue* ll, char* name, uint32_t time_start, uint32_t priority, uint32_t N, uint32_t* rafagas, uint32_t q)
 {
   // Solo las listas NEW_PROCESS pueden crear elementos
   if (ll -> type == NEW_PROCESS){
@@ -240,10 +240,12 @@ void ll_add_new(Queue* ll, char* name, uint32_t time_start, uint32_t priority, u
     }
     // Sumo 1 al numero de nodos
     ll -> count++;
+    return process;
   }
   else{
     printf("no puedo agregar procesos\n" );
   }
+  return NULL;
 }
 
 /** Asignamos los PID por orden de llegada*/

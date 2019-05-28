@@ -30,6 +30,8 @@ typedef struct process
   /** Puntero al nodo siguiente */
   struct process* next;
 
+  struct process* next_print; //se usa para calcular el output
+
   //Estadisticas
   uint32_t n_cpu;
   uint32_t n_interrupt;
@@ -97,7 +99,7 @@ void process_print(Process* process);
 Queue* ll_init(TypeQueue type);
 
 /** Funcion que agrega un elemento(crea el proceso) de manera ordenada (segun time) de la lista ligada */
-void ll_add_new(Queue* ll, char* name, uint32_t time_start, uint32_t priority, uint32_t N, uint32_t* rafagas, uint32_t q);
+Process* ll_add_new(Queue* ll, char* name, uint32_t time_start, uint32_t priority, uint32_t N, uint32_t* rafagas, uint32_t q);
 
 /** Asignamos los PID por orden de llegada*/
 void ll_id(Queue * ll);

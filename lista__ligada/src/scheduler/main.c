@@ -42,7 +42,6 @@ int main(int argument_count, char** arguments)
   else{
     if (no_np == 0){
       q = 0;
-      printf("soy q = 0\n" );
     }
     else{
       q = 3;
@@ -81,6 +80,9 @@ int main(int argument_count, char** arguments)
   FILE* file = fopen(filename, "r");
   char name0[256];
   uint32_t priority0, time_start0, N0;
+  Process* start;
+  Process* current;
+  Process* next;
   while (fscanf(file, "%s %d %d %d\t", name0, &priority0, &time_start0, &N0) != EOF) {
     //fscanf(file, "%s %d %d %d\t", name0, &priority0, &time_start0, &N0);
 //    printf("%s %d %d %d \n", name0, priority0, time_start0, N0);
@@ -89,7 +91,16 @@ int main(int argument_count, char** arguments)
       fscanf(file, "%d", &arreglo[i]);
 //      printf("%d\n", arreglo[i] );
     }
-    ll_add_new(all_process, name0, time_start0, priority0, N0, arreglo, q);
+    next = ll_add_new(all_process, name0, time_start0, priority0, N0, arreglo, q);
+
+    if (all_process->count ==1){
+      start = ll_get(all_process, 0);
+      current = start;
+    }
+    else{
+      current->next_print = next;
+      current = next;
+    }
   }
   fclose(file);
 
@@ -234,6 +245,21 @@ int main(int argument_count, char** arguments)
       continuo =false;
     }
   }
+
+  //Imprimimos el output
+  FILE * f_out = fopen(output_name, "w+");
+
+  if (start){
+    Process* process = start;
+    while (1) {
+      fprintf(f_out, "%s,%d,%d,%d,%d,%d\n", process->name, process->n_cpu, process->n_interrupt, process->turnaround, process->response_t, process->waiting);
+      if (!process->next_print){
+        break;
+      }
+      process = process -> next_print;
+    }
+  }
+/* print antiguo
   FILE * f_out = fopen(output_name, "w+");
 
   if (finished_process -> start){
@@ -246,6 +272,7 @@ int main(int argument_count, char** arguments)
       process = process -> next;
     }
   }
+*/
 
   // Creamos el output del archivo
 /*
