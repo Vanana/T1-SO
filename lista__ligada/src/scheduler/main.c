@@ -193,6 +193,7 @@ int main(int argument_count, char** arguments)
           actual -> turn ++;
           ll_append(ready_process, actual);
         }
+        if (!actual->next) break;
         actual = actual -> next;
       }
     }
